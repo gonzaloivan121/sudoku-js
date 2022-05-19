@@ -9,7 +9,8 @@ class DIFFICULTY {
 var initialized = false;
 var difficulty_container = document.getElementById("difficulty");
 
-var points = 0;
+var lifes = 3;
+var game_over = false;
 
 const begins_x = [1, 10, 19, 28, 37, 46, 55, 64, 73];
 const ends_x = [9, 18, 27, 36, 45, 54, 63, 72, 81];
@@ -23,6 +24,7 @@ initialize();
 function initialize() {
     if (!initialized) {
         initialize_difficulty();
+        initialize_lifes();
 
         for (var i = 1; i <= TOTAL_CELLS; i++) {
             var cell = document.getElementById(i);
@@ -31,7 +33,43 @@ function initialize() {
             set_input_on_cell(cell);
         }
 
+        generate_board();
+
         initialized = true;
+    }
+}
+
+function initialize_lifes() {
+    update_lifes();
+}
+
+function update_lifes() {
+    document.getElementById("lifes").innerText = lifes;
+}
+
+function reset_lifes() {
+    lifes = 3;
+    update_lifes();
+}
+
+function loose_a_life() {
+    if (!game_over) {
+        lifes--;
+        update_lifes();
+    
+        if (lifes == 0) {
+            set_game_over();
+        }
+    }
+}
+
+function set_game_over() {
+    game_over = true;
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
+        var cell = document.getElementById(i);
+        cell.disabled = true;
+        cell.style.background = "#952828";
+        cell.style.color = "white";
     }
 }
 
@@ -108,13 +146,44 @@ function focus_cell(id) {
 function check_correct(cell) {
     if (cell.value != result_arr[cell.id - 1]) {
         cell.style.color = "#952828";
+        loose_a_life();
     } else {
         cell.style.color = "white";
     }
 }
 
+function clear_board() {
+    reset_lifes();
+
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
+        var cell = document.getElementById(i);
+        cell.value = "";
+        cell.style.color = "white";
+        cell.style.background = "transparent";
+        cell.disabled = false;
+    }
+
+    game_over = false;
+}
+
+function restart_board() {
+    reset_lifes();
+
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
+        var cell = document.getElementById(i);
+        if (!cell.disabled) {
+            cell.value = "";
+            cell.style.color = "white";
+            cell.style.background = "transparent";
+            cell.disabled = false;
+        }
+    }
+
+    game_over = false;
+}
+
 function generate_board() {
-    clear_board();
+    clear_board();    
 
     var difficulty = parseInt(difficulty_container.value);
     var iterations = 0;

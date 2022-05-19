@@ -1,25 +1,5 @@
 const TOTAL_CELLS = 81;
 
-function clear_board() {
-    for (var i = 1; i <= TOTAL_CELLS; i++) {
-        var cell = document.getElementById(i);
-        cell.value = "";
-        cell.style.color = "white";
-        cell.disabled = false;
-    }
-}
-
-function restart_board() {
-    for (var i = 1; i <= TOTAL_CELLS; i++) {
-        var cell = document.getElementById(i);
-        if (!cell.disabled) {
-            cell.value = "";
-            cell.style.color = "white";
-            cell.disabled = false;
-        }
-    }
-}
-
 function get_answer() {
     var bool = check_input();
     if (bool) {
