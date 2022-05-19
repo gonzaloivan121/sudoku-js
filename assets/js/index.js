@@ -3,10 +3,24 @@ class DIFFICULTY {
     static Medium = 2;
     static Hard = 3;
     static Hell = 4;
+    static Impossible = 5;
+
+    static Get_Difficulty(d) {
+        for (const difficulty in this) {
+            if (this[difficulty] === d) return difficulty;
+        }
+    }
 };
 
 var initialized = false;
 var difficulty_container = document.getElementById("difficulty");
+
+var points = 0;
+
+var begins_x = [1, 10, 19, 28, 37, 46, 55, 64, 73];
+var ends_x = [9, 18, 27, 36, 45, 54, 63, 72, 81];
+var begins_y = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+var ends_y = [73, 74, 75, 76, 77, 78, 79, 80, 81];
 
 initialize();
 
@@ -19,12 +33,16 @@ function initialize() {
             difficulty_container.appendChild(difficulty_option);
         }
 
-        for (var i = 1; i <= 81; i++) {
+        for (var i = 1; i <= TOTAL_CELLS; i++) {
             var cell = document.getElementById(i);
             cell.addEventListener("focus", (ev) => {
-                focus_cell(parseInt(ev.target.id));
+                var c = ev.target;
+                if (c.style.color !== "white") {
+                    c.style.color = "white";
+                }
+                focus_cell(parseInt(c.id));
             });
-            cell.addEventListener("focusout", (ev) => {
+            cell.addEventListener("focusout", () => {
                 focusout_cells();
             });
         }
@@ -34,18 +52,13 @@ function initialize() {
 }
 
 function focusout_cells() {
-    for (var i = 1; i <= 81; i++) {
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
         var cell = document.getElementById(i);
         cell.classList.remove("highlighted");
     }
 }
 
 function focus_cell(id) {
-    var begins_x = [1, 10, 19, 28, 37, 46, 55, 64, 73];
-    var ends_x = [9, 18, 27, 36, 45, 54, 63, 72, 81];
-    var begins_y = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    var ends_y = [73, 74, 75, 76, 77, 78, 79, 80, 81];
-
     var x = id % 9;
     if (x === 0) x = 9;
     var y = 0;
@@ -87,15 +100,26 @@ function generate_board() {
             iterations = random(15, 30);
             break;
         case DIFFICULTY.Hell:
-            iterations = random(3, 10);
+            iterations = random(5, 10);
+            break;
+        case DIFFICULTY.Impossible:
+            iterations = random(3, 5);
             break;
     }
 
     for (var i = 0; i < iterations; i++) {
-        var random_cell = random(1, 81);
+        var random_cell = random(1, TOTAL_CELLS);
         var random_number = random(1, 9);
         generate_cell(random_cell, random_number);
     }
+
+    var grid = read_a_puzzle();
+
+    if (!search(grid)) {
+        generate_board();
+    }
+
+    return { Difficulty: DIFFICULTY.Get_Difficulty(difficulty), Iterations: iterations };
 }
 
 function generate_cell(random_cell, random_number) {
@@ -114,4 +138,21 @@ function generate_cell(random_cell, random_number) {
 
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function check_board() {
+    var grid = read_a_puzzle();
+    var valid_cells = get_valid_cells(grid);
+
+    for (var i = 1; i <= valid_cells.length; i++) {
+        var cell = document.getElementById(i);
+
+        if (valid_cells[i-1] && !cell.disabled && cell.value !== "") {
+            cell.style.color = "#44c944";
+        }
+
+        if (!valid_cells[i-1] && !cell.disabled && cell.value !== "") {
+            cell.style.color = "#952828";
+        }
+    }
 }
