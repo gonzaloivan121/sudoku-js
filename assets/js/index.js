@@ -4,12 +4,6 @@ class DIFFICULTY {
     static Hard = 3;
     static Hell = 4;
     static Impossible = 5;
-
-    static Get_Difficulty(d) {
-        for (const difficulty in this) {
-            if (this[difficulty] === d) return difficulty;
-        }
-    }
 };
 
 var initialized = false;
@@ -17,47 +11,66 @@ var difficulty_container = document.getElementById("difficulty");
 
 var points = 0;
 
-var begins_x = [1, 10, 19, 28, 37, 46, 55, 64, 73];
-var ends_x = [9, 18, 27, 36, 45, 54, 63, 72, 81];
-var begins_y = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-var ends_y = [73, 74, 75, 76, 77, 78, 79, 80, 81];
+const begins_x = [1, 10, 19, 28, 37, 46, 55, 64, 73];
+const ends_x = [9, 18, 27, 36, 45, 54, 63, 72, 81];
+const begins_y = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const ends_y = [73, 74, 75, 76, 77, 78, 79, 80, 81];
+
+var result_arr = [];
 
 initialize();
 
 function initialize() {
     if (!initialized) {
-        for (const property in DIFFICULTY) {
-            var difficulty_option = document.createElement("option");
-            difficulty_option.value = DIFFICULTY[property];
-            difficulty_option.innerHTML = property;
-            difficulty_container.appendChild(difficulty_option);
-        }
+        initialize_difficulty();
 
         for (var i = 1; i <= TOTAL_CELLS; i++) {
             var cell = document.getElementById(i);
-            cell.addEventListener("focus", (ev) => {
-                var c = ev.target;
-                if (c.style.color !== "white") {
-                    c.style.color = "white";
-                }
-                focus_cell(parseInt(c.id));
-            });
-            cell.addEventListener("focusout", () => {
-                focusout_cells();
-            });
-            cell.addEventListener("input", (ev) => {
-                if (isNaN(ev.target.value)) {
-                    ev.target.value = "";
-                } else {
-                    if (ev.target.value < 1 || ev.target.value > 9) {
-                        ev.target.value = "";
-                    }
-                }
-            })
+            set_focus_on_cell(cell);
+            set_focusout_on_cell(cell);
+            set_input_on_cell(cell);
         }
 
         initialized = true;
     }
+}
+
+function initialize_difficulty() {
+    for (const property in DIFFICULTY) {
+        var difficulty_option = document.createElement("option");
+        difficulty_option.value = DIFFICULTY[property];
+        difficulty_option.innerHTML = property;
+        difficulty_container.appendChild(difficulty_option);
+    }
+}
+
+function set_focus_on_cell(cell) {
+    cell.addEventListener("focus", (e) => {
+        if (e.target.style.color !== "white") {
+            e.target.style.color = "white";
+        }
+        focus_cell(parseInt(e.target.id));
+    });
+}
+
+function set_focusout_on_cell(cell) {
+    cell.addEventListener("focusout", () => {
+        focusout_cells();
+    });
+}
+
+function set_input_on_cell(cell) {
+    cell.addEventListener("input", (e) => {
+        if (isNaN(e.target.value)) {
+            e.target.value = "";
+        } else {
+            if (e.target.value < 1 || e.target.value > 9) {
+                e.target.value = "";
+            } else {
+                check_correct(e.target);
+            }
+        }
+    });
 }
 
 function focusout_cells() {
@@ -89,6 +102,14 @@ function focus_cell(id) {
     for (var i = begin_y; i <= end_y; i+=9) {
         var cell = document.getElementById(i);
         cell.classList.add("highlighted");
+    }
+}
+
+function check_correct(cell) {
+    if (cell.value != result_arr[cell.id - 1]) {
+        cell.style.color = "#952828";
+    } else {
+        cell.style.color = "white";
     }
 }
 
@@ -126,9 +147,9 @@ function generate_board() {
 
     if (!search(grid)) {
         generate_board();
+    } else {
+        result_arr = return_ans();
     }
-
-    return { Difficulty: DIFFICULTY.Get_Difficulty(difficulty), Iterations: iterations };
 }
 
 function generate_cell(random_cell, random_number) {

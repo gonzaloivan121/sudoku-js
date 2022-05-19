@@ -201,6 +201,20 @@ function output_ans() {
     }
 }
 
+//returns the answer
+function return_ans() {
+    var grid = read_a_puzzle();
+    var arr = [];
+
+    if (search(grid)) {
+        for (var i = 1; i <= TOTAL_CELLS; i++) {
+            arr.push(grid[Math.floor((i - 1) / 9)][(i - 1) % 9]);
+        }
+    }
+
+    return arr;
+}
+
 //Obtain a list of free cells from the puzzle
 function get_free_cell_list(grid) {
     var freeCellList = new Array();
