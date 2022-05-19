@@ -45,6 +45,15 @@ function initialize() {
             cell.addEventListener("focusout", () => {
                 focusout_cells();
             });
+            cell.addEventListener("input", (ev) => {
+                if (isNaN(ev.target.value)) {
+                    ev.target.value = "";
+                } else {
+                    if (ev.target.value < 1 || ev.target.value > 9) {
+                        ev.target.value = "";
+                    }
+                }
+            })
         }
 
         initialized = true;
