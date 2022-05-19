@@ -1,5 +1,7 @@
+const TOTAL_CELLS = 81;
+
 function clear_board() {
-    for (var i = 1; i <= 81; i++) {
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
         var cell = document.getElementById(i);
         cell.value = "";
         cell.style.color = "white";
@@ -8,7 +10,7 @@ function clear_board() {
 }
 
 function restart_board() {
-    for (var i = 1; i <= 81; i++) {
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
         var cell = document.getElementById(i);
         if (!cell.disabled) {
             cell.value = "";
@@ -37,7 +39,7 @@ function get_answer() {
 function check_input() {
     var arr = new Array();
 
-    for (var i = 1; i <= 81; i++) {
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
         arr[i] = Number(document.getElementById(i).value);
         if (isNaN(arr[i])) {
             alert('Input should be any number between 1 and 9 !');
@@ -57,7 +59,7 @@ function read_a_puzzle() {
     var arr = new Array();
     var grid = new Array();
 
-    for (var i = 1; i <= 81; i++) {
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
         arr[i] = Number(document.getElementById(i).value);
     }
 
@@ -68,7 +70,7 @@ function read_a_puzzle() {
         }
     }
     
-    for (var i = 1; i <= 81; i++) {
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
         grid[Math.floor((i-1) / 9)][(i-1) % 9] = arr[i];
     }
 
@@ -84,6 +86,21 @@ function is_valid_grid(grid) {
         }
     }
     return true;
+}
+
+function get_valid_cells(grid) {
+    var cell_array = new Array();
+
+    for (var i = 0; i < 9; i++) {
+        for (var j = 0; j < 9; j++) {
+            if ((grid[i][j] < 0) || (grid[i][j] > 9) || ((grid[i][j] != 0) && (!is_valid(i, j, grid)))) {
+                cell_array.push(false);
+            } else {
+                cell_array.push(true);
+            }
+        }
+    }
+    return cell_array;
 }
 
 //Check whether grid[i][j] is valid in the grid
@@ -175,7 +192,7 @@ function output_ans() {
     var grid_original = read_a_puzzle();
 
     if (search(grid)) {
-        for (var i = 1; i <= 81; i++) {
+        for (var i = 1; i <= TOTAL_CELLS; i++) {
             if (grid[Math.floor((i - 1) / 9)][(i - 1) % 9] != grid_original[Math.floor((i - 1) / 9)][(i - 1) % 9]) {
                 document.getElementById(i).value = grid[Math.floor((i - 1) / 9)][(i - 1) % 9];
                 document.getElementById(i).style.color = "#44c944";
