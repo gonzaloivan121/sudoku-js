@@ -18,6 +18,7 @@ const begins_y = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const ends_y = [73, 74, 75, 76, 77, 78, 79, 80, 81];
 
 var result_arr = [];
+var starting_cells = [];
 
 initialize();
 
@@ -152,38 +153,46 @@ function check_correct(cell) {
     }
 }
 
-function clear_board() {
-    reset_lifes();
-
-    for (var i = 1; i <= TOTAL_CELLS; i++) {
-        var cell = document.getElementById(i);
-        cell.value = "";
-        cell.style.color = "white";
-        cell.style.background = "transparent";
-        cell.disabled = false;
-    }
-
-    game_over = false;
+function clear_cell(cell) {
+    cell.value = "";
+    cell.style.color = "white";
+    cell.style.background = "transparent";
+    cell.disabled = false;
 }
 
-function restart_board() {
+function restart_cell(cell, starting_cell) {
+    cell.value = starting_cell.value;
+    cell.style.color = starting_cell.color;
+    cell.style.background = starting_cell.background;
+    cell.disabled = starting_cell.disabled;
+}
+
+function restart_board(clear = false) {
     reset_lifes();
 
     for (var i = 1; i <= TOTAL_CELLS; i++) {
         var cell = document.getElementById(i);
-        if (!cell.disabled) {
-            cell.value = "";
-            cell.style.color = "white";
-            cell.style.background = "transparent";
-            cell.disabled = false;
+        if (clear) {
+            clear_cell(cell);
+            clear_starting_cells();
+        } else {
+            if (starting_cells.length !== 0) {
+                var starting_cell = starting_cells[i - 1];
+                restart_cell(cell, starting_cell);
+            }
         }
     }
 
     game_over = false;
 }
 
+function clear_starting_cells() {
+    starting_cells = [];
+}
+
 function generate_board() {
-    clear_board();    
+    restart_board(true);
+    clear_starting_cells();
 
     var difficulty = parseInt(difficulty_container.value);
     var iterations = 0;
@@ -218,6 +227,19 @@ function generate_board() {
         generate_board();
     } else {
         result_arr = return_ans();
+        generate_starting_cells();
+    }
+}
+
+function generate_starting_cells() {
+    for (let i = 1; i <= TOTAL_CELLS; i++) {
+        var cell = document.getElementById(i);
+        starting_cells.push({
+            value: cell.value,
+            color: cell.style.color,
+            background: cell.style.background,
+            disabled: cell.disabled
+        });
     }
 }
 
