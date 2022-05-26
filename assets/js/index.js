@@ -105,8 +105,6 @@ function set_input_on_cell(cell) {
         } else {
             if (e.target.value < 1 || e.target.value > 9) {
                 e.target.value = "";
-            } else {
-                check_correct(e.target);
             }
         }
     });
@@ -156,7 +154,6 @@ function check_correct(cell) {
 function clear_cell(cell) {
     cell.value = "";
     cell.style.color = "white";
-    cell.style.background = "transparent";
     cell.disabled = false;
 }
 
@@ -262,18 +259,24 @@ function random(min, max) {
 }
 
 function check_board() {
-    var grid = read_a_puzzle();
-    var valid_cells = get_valid_cells(grid);
+    var error_count = 0;
 
-    for (var i = 1; i <= valid_cells.length; i++) {
+    for (var i = 1; i <= TOTAL_CELLS; i++) {
         var cell = document.getElementById(i);
 
-        if (valid_cells[i-1] && !cell.disabled && cell.value !== "") {
+        // Correct
+        if (parseInt(cell.value) == result_arr[cell.id - 1] && !cell.disabled && cell.value !== "") {
             cell.style.color = "#44c944";
         }
 
-        if (!valid_cells[i-1] && !cell.disabled && cell.value !== "") {
+        // Error
+        if (parseInt(cell.value) != result_arr[cell.id - 1] && !cell.disabled && cell.value !== "") {
             cell.style.color = "#952828";
+            error_count++;
         }
+    }
+
+    if (error_count > 0) {
+        loose_a_life();
     }
 }
