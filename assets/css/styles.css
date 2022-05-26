@@ -86,7 +86,7 @@ html, body {
 }
 
 .box.highlighted {
-    background: #ffffff1f;
+    background: #ffffff1f !important;
 }
 
 .inner-cell:not(:last-child) {

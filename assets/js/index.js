@@ -154,6 +154,7 @@ function check_correct(cell) {
 function clear_cell(cell) {
     cell.value = "";
     cell.style.color = "white";
+    cell.style.background = "transparent";
     cell.disabled = false;
 }
 
